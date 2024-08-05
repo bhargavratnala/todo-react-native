@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, ScrollView, Pressable, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, TextInput, Button, ScrollView, Pressable, LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -8,23 +8,7 @@ if (Platform.OS === 'android') {
 }
 
 export default function Layout() {
-  const [todos, setTodos] = useState([
-    {
-      title: "Todo 1",
-      description: "Todo Description",
-      is_collapsed: true,
-    },
-    {
-      title: "Todo 2",
-      description: "Todo Description",
-      is_collapsed: true,
-    },
-    {
-      title: "Todo 3",
-      description: "Todo Description",
-      is_collapsed: true,
-    },
-  ]);
+  const [todos, setTodos] = useState([]);
   const [form, setForm] = useState({title: "", description: ""});
 
   const todoStyle = {
@@ -112,12 +96,19 @@ export default function Layout() {
 		  onPress={() => {
 			LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 			setTodos(prev => {
+			  if (!form.title || !form.description) {
+				Alert.alert("Please fill all fields");
+				return prev;
+			  }
 			  return [...prev, {
 				title: form.title,
 				description: form.description,
 				is_collapsed: true,
 			  }];
 			});
+			if (!form.title || !form.description) {
+			  return;
+			}
 			setForm({title: "", description: ""});
 		  }}
         />
@@ -129,7 +120,7 @@ export default function Layout() {
         borderBottomRightRadius: 16,
         padding: 16,
       }}>
-        {todos.map((todo, index) => (
+        {todos.length!=0 && todos.map((todo, index) => (
           <View key={index} style={todoStyle}>
             <View style={{
               flexDirection: "row",
@@ -153,7 +144,11 @@ export default function Layout() {
               </View>
             )}
           </View>
-        ))}
+        )) || <Text style={{
+		  color: "#000",
+		  textAlign: "center",
+		  padding: 16,
+		}}>Your completed all Tasks</Text>}
       </ScrollView>
     </View>
   );
